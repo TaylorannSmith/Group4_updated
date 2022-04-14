@@ -8,36 +8,86 @@ output: rmdformats::material
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message= FALSE, warning = FALSE)
 ```
-# Plotly
+# An Introduction to the Package Plotly
 
 ### What is Plotly?
 Plotly is a graphing library that allows you to make publication-quality graphs. It not only can be used along with R, but python, and matlab as well as other software. Not only can you make beautiful publication quality plots, maps, charts etc. but they are interactive as well, allowing you to view individual datapoints within a plot. 
+
+![loading](https://repository-images.githubusercontent.com/33702544/b4400c80-718b-11e9-9f3a-306c07a5f3de)
 
 
 # Install the package
 First you can install the package, and then I will walk you through a few of the basic but useful functions within the plotly package. 
 ```{r}
 #install.packages("plotly")
-```
 
-# Load the package and the data set
-Today we are going to use a tidy tuesday chocolate data set
+```
+![image](https://external-preview.redd.it/UQg297rk0jms0_NbpwCYA1MOPq8cB4GIk2J-TMbiYto.jpg?auto=webp&s=a0e719823ac06115d6be87d6d5df755abdfafeb0)
+
+
+
+# Load the package and data  
 ```{r}
 library(plotly)
 library(tidyverse)
 library(rmdformats)
-chocolate <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-01-18/chocolate.csv')
 
-Choc<-filter(.data = chocolate, company_manufacturer == "Seahorse")
+DuBois<-tibble::tribble(
+  ~Year, ~Property.Valuation,
+  1870L,             300000L,
+  1871L,             800000L,
+  1872L,            1100000L,
+  1873L,            1200000L,
+  1874L,            1150000L,
+  1875L,            1200000L,
+  1876L,            1180000L,
+  1877L,            1100000L,
+  1878L,            1050000L,
+  1879L,            1050000L,
+  1880L,            1200000L,
+  1881L,            1400000L,
+  1882L,            1600000L,
+  1883L,            1800000L,
+  1884L,            1900000L,
+  1885L,            2000000L,
+  1886L,            2200000L,
+  1887L,            2500000L,
+  1888L,            2700000L,
+  1889L,            3200000L,
+  1890L,            3400000L,
+  1891L,            4000000L,
+  1892L,            4700000L,
+  1893L,            4850000L,
+  1894L,            4600000L,
+  1895L,            4300000L,
+  1896L,            4300000L,
+  1897L,            4200000L,
+  1898L,            4300000L,
+  1899L,            4300000L,
+  1900L,            4350000L
+  )
 
 ```
 
-# Learning how to make an interactive Plot
+
+
+
+# Example 1: Learning how to make an interactive Plot
 Lets say we want to make a simple scatterplot or line graph:
 Unlike we are used to, we will not be starting our code with ggplot! Shocking I know!
 ```{r}
-#plot_ly(chocolate, x= ~review_date,
-#y= ~rating
+#plot_ly(Dubois, x= ~Year,
+#y = ~ property.valuation,
+
+#type= ‘scatter’,
+
+#mode= ‘lines+markers’)%>%
+
+# How to add a title to your plot
+
+#layout(title = list(text= ‘Whatever you want the plot title to be’))
+
+
 ```
 
 Rather than using geom()...
@@ -45,40 +95,55 @@ Rather than using geom()...
 #type= ‘scatter’,
 
 #mode= ‘lines+markers’)%>%
+
+# How to add a title to your plot
+
+#layout(title = list(text= ‘Whatever you want the plot title to be’))
+####learn how to save plots and if its the same or if you can use the here package
   
 ```
 
 
-# How to add a title to your plot
-```{r}
-#layout(title = list(text= ‘Whatever you want the plot title to be’))
-####learn how to save plots and if its the same or if you can use the here package
-```
  
 # Now let's run it all together:
 ```{r}
 
-plot_ly(Choc, x= ~review_date, y = ~rating, type = 'scatter', mode = 'lines+markers') %>% 
-  layout(title= list(text= 'This is my chocolate'))
+plot_ly(DuBois, x= ~Year, y = ~Property.Valuation, type = 'scatter', mode = 'lines+markers') %>% 
+  layout(title= list(text= 'This is my rendition of DuBois graph'))
 
 
 
 ```
 
 
-
-
-## Let's make another type of figure:
-### Contour plot
+# Example 2: Making a bubble chart with continuous data
+```{r}
+example <- read.csv("https://raw.githubusercontent.com/plotly/datasets/master/school_earnings.csv")
+```
 
 ```{r}
-## Now I will teach you how to make another type of figure, a contour map
-#Teach how to make that
 
+
+
+fig <- plot_ly(example, x = ~Women, 
+               y = ~Men, 
+               text = ~School, 
+               type = 'scatter', 
+               mode = 'markers', 
+               color = ~Gap, colors = 'Reds',
+        marker = list(size = ~Gap, opacity = 0.5))
+
+fig <- fig %>% layout(title = 'Gender Gap in Earnings per University',
+         xaxis = list(showgrid = FALSE),
+         yaxis = list(showgrid = FALSE))
+fig
 ```
 
-Now that you have learned a bit about how interactive figures are able to get with this package, lets take it a step further and learn how to incorporate even more interactive customizations 
 
+# Let's move on to something a little more... complex
+Now that you have learned a bit about how interactive figures are able to get with this package, lets take it a step further and learn how to incorporate even more interactive customizations.
+
+![complex](https://neilpatel.com/wp-content/uploads/2021/03/Data-Visualization_Featured-Image-1.png)
 
 # Histograms:
 ## Basic Histogram
@@ -132,9 +197,12 @@ Now, it's time to start building the actual map using plot_geo.
 statepop$hover <- with(statepop, paste(State, '<br>',Postal, '<br>'))
 
 map1 <- plot_geo(statepop, locationmode = 'USA-states')
-popup1 <- map1 %>% add_trace(
-    z = ~Population, text = ~hover, locations = ~Postal,
-    color = ~Population, colors = 'Purples'
+popup1 <- map1 %>% 
+  add_trace(z = ~Population, 
+            text = ~hover, 
+            locations = ~Postal,
+            color = ~Population, 
+            colors = 'Purples'
   )
 ```
 
@@ -149,7 +217,7 @@ popup1 <- map1 %>% add_trace(
   )
 fig <- popup1 %>% colorbar(title = "Population")
 usmap1 <- fig %>% layout(
-    title = 'State populations in 2014)'
+    title = 'State populations in 2014'
   )
 
 usmap1
@@ -270,5 +338,6 @@ More options to explore with plotly:
 Plotly's page for R includes many helpful resources and examples for each type of figure.
 
 Find it [here!](https://plotly.com/r/)
+
 
 
