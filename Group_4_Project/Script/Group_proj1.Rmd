@@ -1,0 +1,274 @@
+---
+title: "Introduction to the package Plotly"
+author: "Taylorann Smith and Lindsay Fisher"
+date: "4/11/2022"
+output: rmdformats::material
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message= FALSE, warning = FALSE)
+```
+# Plotly
+
+### What is Plotly?
+Plotly is a graphing library that allows you to make publication-quality graphs. It not only can be used along with R, but python, and matlab as well as other software. Not only can you make beautiful publication quality plots, maps, charts etc. but they are interactive as well, allowing you to view individual datapoints within a plot. 
+
+
+# Install the package
+First you can install the package, and then I will walk you through a few of the basic but useful functions within the plotly package. 
+```{r}
+#install.packages("plotly")
+```
+
+# Load the package and the data set
+Today we are going to use a tidy tuesday chocolate data set
+```{r}
+library(plotly)
+library(tidyverse)
+library(rmdformats)
+chocolate <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-01-18/chocolate.csv')
+
+Choc<-filter(.data = chocolate, company_manufacturer == "Seahorse")
+
+```
+
+# Learning how to make an interactive Plot
+Lets say we want to make a simple scatterplot or line graph:
+Unlike we are used to, we will not be starting our code with ggplot! Shocking I know!
+```{r}
+#plot_ly(chocolate, x= ~review_date,
+#y= ~rating
+```
+
+Rather than using geom()...
+```{r}
+#type= ‘scatter’,
+
+#mode= ‘lines+markers’)%>%
+  
+```
+
+
+# How to add a title to your plot
+```{r}
+#layout(title = list(text= ‘Whatever you want the plot title to be’))
+####learn how to save plots and if its the same or if you can use the here package
+```
+ 
+# Now let's run it all together:
+```{r}
+
+plot_ly(Choc, x= ~review_date, y = ~rating, type = 'scatter', mode = 'lines+markers') %>% 
+  layout(title= list(text= 'This is my chocolate'))
+
+
+
+```
+
+
+
+
+## Let's make another type of figure:
+### Contour plot
+
+```{r}
+## Now I will teach you how to make another type of figure, a contour map
+#Teach how to make that
+
+```
+
+Now that you have learned a bit about how interactive figures are able to get with this package, lets take it a step further and learn how to incorporate even more interactive customizations 
+
+
+# Histograms:
+## Basic Histogram
+
+Making the most basic histograms only requires one line of code!
+
+```{r}
+his1 <- plot_ly(x = ~rnorm(50), type = "histogram")
+
+his1
+```
+
+## Normalized Histogram
+
+Now, let's make a normalized histogram, with one more added argument.
+
+```{r}
+his2 <- plot_ly(x = ~rnorm(50),
+             type = "histogram",
+             histnorm = "probability")
+
+his2
+```
+
+# Making Interactive Maps
+
+Now that we know the basics of plotly, as well as how to make a few different types of graphs, let's explore some more advanced figures by creating interactive maps.
+
+The maps you can create using Plotly are called Choropleth maps, which are made up of separate polygons, which can each be a different color
+
+## US States by Population
+
+First, let's read in the data set. 
+
+```{r}
+statepop <- read.csv("https://raw.githubusercontent.com/plotly/datasets/master/2014_usa_states.csv")
+```
+
+Next, we need to create the hovering part of the map. This will allow the user to scroll over each state to get the population info.
+
+The <br> helps to separate each piece into a different line on the visual.
+
+```{r}
+statepop$hover <- with(statepop, paste(State, '<br>',Postal, '<br>'))
+
+```
+
+Now, it's time to start building the actual map using plot_geo.
+
+```{r}
+statepop$hover <- with(statepop, paste(State, '<br>',Postal, '<br>'))
+
+map1 <- plot_geo(statepop, locationmode = 'USA-states')
+popup1 <- map1 %>% add_trace(
+    z = ~Population, text = ~hover, locations = ~Postal,
+    color = ~Population, colors = 'Purples'
+  )
+```
+
+Finally, we add on a legend using 'colorbar' and add  title. 
+```{r}
+statepop$hover <- with(statepop, paste(State, '<br>',Postal, '<br>'))
+
+map1 <- plot_geo(statepop, locationmode = 'USA-states')
+popup1 <- map1 %>% add_trace(
+    z = ~Population, text = ~hover, locations = ~Postal,
+    color = ~Population, colors = 'Purples'
+  )
+fig <- popup1 %>% colorbar(title = "Population")
+usmap1 <- fig %>% layout(
+    title = 'State populations in 2014)'
+  )
+
+usmap1
+```
+
+
+## Zoom in to only include the US
+
+We can narrow down the map to only show the US in order to ge a closer view. In order to do this, we will have to make a list.
+
+```{r}
+g <- list(
+  scope = 'usa',
+  projection = list(type = 'albers usa'),
+  showlakes = TRUE,
+  lakecolor = toRGB('white')
+)
+```
+
+It will be inserted after statepop$hover.
+
+```{r}
+statepop <- read.csv("https://raw.githubusercontent.com/plotly/datasets/master/2014_usa_states.csv")
+statepop$hover <- with(statepop, paste(State, '<br>',Postal, '<br>'))
+
+g <- list(
+  scope = 'usa',
+  projection = list(type = 'albers usa'),
+  showlakes = TRUE,
+  lakecolor = toRGB('white')
+)
+
+map1 <- plot_geo(statepop, locationmode = 'USA-states')
+popup1 <- map1 %>% add_trace(
+    z = ~Population, text = ~hover, locations = ~Postal,
+    color = ~Population, colors = 'Purples'
+  )
+fig1 <- popup1 %>% colorbar(title = "Population")
+usmap <- fig1 %>% layout(
+    title = 'State populations in 2014)',
+    geo = g
+  )
+
+usmap
+```
+
+# Think Pair Share
+
+Spend 5 minutes to make a interactive map with the agricultural exports data set below.
+
+https://raw.githubusercontent.com/plotly/datasets/master/2011_us_ag_exports.csv
+
+
+# Results
+
+Your code and map should look something like this
+
+```{r}
+agexports <- read.csv("https://raw.githubusercontent.com/plotly/datasets/master/2011_us_ag_exports.csv")
+agexports$hover <- with(agexports, paste(state, '<br>', "Beef", beef, "Dairy", dairy, "<br>", "Fruits", total.fruits, "Veggies", total.veggies, "<br>", "Wheat", wheat, "Corn", corn))
+
+g <- list(
+  scope = 'usa',
+  projection = list(type = 'albers usa'),
+  showlakes = TRUE,
+  lakecolor = toRGB('white')
+)
+
+map <- plot_geo(agexports, locationmode = 'USA-states')
+popup <- map %>% add_trace(
+    z = ~total.exports, text = ~hover, locations = ~code,
+    color = ~total.exports, colors = 'Purples'
+  )
+fig1 <- popup %>% colorbar(title = "Millions USD")
+fig2 <- fig1 %>% layout(
+    title = 'US Agriculture Exports by State)',
+    geo = g
+  )
+
+fig2
+```
+# Using Buttons
+
+Another cool option you can use with plotly is buttons and sliders. We won't code any today for the sake of time, but 
+if you wanted to insert interactive buttons on a plot, you would use the format shown below.
+
+There are 3 main method types for creating buttons:
+
+* restyle: modify data or data attributes
+* relayout: modify layout attributes
+* update: modify data and layout attributes
+
+Let's take a look at Plotly's page on buttons: [here](https://plotly.com/r/custom-buttons/)
+
+
+# Summary
+
+Some of the Plotly features we learned today were:
+
+* plot_geo: for maps
+* plot_ly: for graphs
+* $hover: to create interactive information pop ups
+* making lists
+* intro to making buttons
+
+Plotly is a great option for making: 
+
+* line graphs
+* histograms
+* interactive maps
+
+More options to explore with plotly:
+
+* scatter plots
+* box plots
+* heatmaps
+
+Plotly's page for R includes many helpful resources and examples for each type of figure.
+
+Find it [here!](https://plotly.com/r/)
+
+
