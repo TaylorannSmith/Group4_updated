@@ -184,7 +184,7 @@ statepop <- read.csv("https://raw.githubusercontent.com/plotly/datasets/master/2
 
 Next, we need to create the hovering part of the map. This will allow the user to scroll over each state to get the population info.
 
-The <br> helps to separate each piece into a different line on the visual.
+The br helps to separate each piece into a different line on the visual.
 
 ```{r}
 statepop$hover <- with(statepop, paste(State, '<br>',Postal, '<br>'))
@@ -251,13 +251,14 @@ g <- list(
 )
 
 map1 <- plot_geo(statepop, locationmode = 'USA-states')
-popup1 <- map1 %>% add_trace(
-    z = ~Population, text = ~hover, locations = ~Postal,
-    color = ~Population, colors = 'Purples'
+popup1 <- map1 %>% add_trace(z = ~Population, 
+                             text = ~hover, 
+                             locations = ~Postal,
+                             color = ~Population, colors =    "Purples"
   )
 fig1 <- popup1 %>% colorbar(title = "Population")
 usmap <- fig1 %>% layout(
-    title = 'State populations in 2014)',
+    title = 'State populations in 2014',
     geo = g
   )
 
@@ -287,12 +288,17 @@ g <- list(
 )
 
 map <- plot_geo(agexports, locationmode = 'USA-states')
-popup <- map %>% add_trace(
-    z = ~total.exports, text = ~hover, locations = ~code,
-    color = ~total.exports, colors = 'Purples'
+popup <- map %>% 
+  add_trace(z = ~total.exports, 
+            text = ~hover, 
+            locations = ~code,
+            color = ~total.exports, 
+            colors = 'Purples'
   )
-fig1 <- popup %>% colorbar(title = "Millions USD")
-fig2 <- fig1 %>% layout(
+fig1 <- popup %>% 
+  colorbar(title = "Millions USD")
+fig2 <- fig1 %>% 
+  layout(
     title = 'US Agriculture Exports by State)',
     geo = g
   )
